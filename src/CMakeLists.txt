@@ -1,6 +1,7 @@
 
 add_executable(tigrep
-  tigrep.cc 
+  tigrep.cc
+  application_config.h
   grep_command.h
   util/date_compare.h
 )
