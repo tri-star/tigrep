@@ -5,7 +5,7 @@ add_executable(run_tests
   ../src/grep_command.h
   ../src/util/date_compare.h
 )
-target_link_libraries(run_tests pthread libboost_regex.a libgtest.a libgtest_main.a)
+target_link_libraries(run_tests ${TIGREP_LINK_LIBRARIES_FOR_TEST})
 
 add_test(NAME all_test COMMAND run_tests)
 
