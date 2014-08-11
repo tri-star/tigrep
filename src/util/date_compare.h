@@ -1,4 +1,4 @@
-
+#include <stdexcept>
 #include <ctime>
 
 namespace tigrep {
@@ -15,6 +15,7 @@ namespace tigrep {
       static const int kIS_LTE = 5;
       
       DateCompare() {
+        base_date_time_ = 0;
       }
       
       DateCompare(const time_t base_date_time) {
@@ -22,19 +23,19 @@ namespace tigrep {
       }
       
       DateCompare(const char* base_time_string, const char* format) {
-        setDateTime(base_time_string, format);
+        setBaseDateTime(base_time_string, format);
       }
       
       virtual ~DateCompare() {
       }
       
-      void setDateTime(const time_t base_date_time) {
+      void setBaseDateTime(const time_t base_date_time) {
         base_date_time_ = base_date_time;
       }
       
-      void setDateTime(const char* date_time_string, const char* format) {
+      void setBaseDateTime(const char* date_time_string, const char* format) {
         time_t base_date_time = getTimestampFromText(date_time_string, format);
-        setDateTime(base_date_time);
+        setBaseDateTime(base_date_time);
       }
       
       bool compare(const time_t target_time, const int mode) {

@@ -7,26 +7,6 @@
 namespace tigrep {
   namespace util {
   
-    TEST(date_compare, initialize_with_timestamp) {
-      //date -d "2014-08-10 10:00:00" +%s
-      time_t base_time = 1407632400;
-      DateCompare d(base_time);
-      
-      ASSERT_TRUE(d.compare(base_time + 1, DateCompare::kIS_GT));
-      ASSERT_FALSE(d.compare(base_time, DateCompare::kIS_GT));
-      
-    }
-    
-    TEST(date_compare, initialize_with_text) {
-      //date -d "2014-08-10 10:00:00" +%s
-      time_t base_time = 1407632400;
-      DateCompare d(base_time);
-      
-      ASSERT_TRUE(d.compare(base_time + 1, DateCompare::kIS_GT));
-      ASSERT_FALSE(d.compare(base_time, DateCompare::kIS_GT));
-      
-    }
-    
     TEST(date_compare, compare_with_timestamp) {
       
       //date -d "2014-08-10 10:00:00" +%s
