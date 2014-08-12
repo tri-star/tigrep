@@ -38,6 +38,13 @@ namespace tigrep {
         }
       }
       
+      if(app_config.start_time.length() > 0 && !isValidDate(app_config.start_time.c_str(), app_config.format.c_str())) {
+        errors_.push_back("invalid start date time.");
+      }
+      if(app_config.end_time.length() > 0 && !isValidDate(app_config.end_time.c_str(), app_config.format.c_str())) {
+        errors_.push_back("invalid end date time.");
+      }
+      
       return (errors_.size() == 0);
     }
     
@@ -65,6 +72,13 @@ namespace tigrep {
         return false;
       }
       return (S_ISREG(st.st_mode));
+    }
+    
+    
+    bool isValidDate(const char* date_string, const char* format) {
+      struct tm tm;
+      char* result = strptime(date_string, format, &tm);
+      return (result != 0);
     }
     
   };

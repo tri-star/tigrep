@@ -16,6 +16,8 @@ namespace tigrep {
       app_config.format = "%Y-%m-%d";
       app_config.output_file = "/tmp/output.log";
       app_config.input_file = "/usr/bin/bash";
+      app_config.start_time = "2014-08-08 10:00:00";
+      app_config.end_time   = "2014-08-10 10:00:00";
     }
     
     void assertMessageIncluded(std::list<std::string>& errors, char* message) {
@@ -76,6 +78,18 @@ namespace tigrep {
     assertMessageIncluded(errors, "format option is required.");
   }
 
+  TEST_F(ApplicationConfigValidatorTest, start_time_and_end_time_could_ommit) {
+    ApplicationConfig app_config;
+    fillWithValidInformation(app_config);
+    app_config.start_time = "";
+    app_config.end_time = "";
+    
+    ApplicationConfigValidator validator;
+    
+    bool is_ok = validator.validate(app_config);
+    ASSERT_TRUE(is_ok);
+  }
+
   TEST_F(ApplicationConfigValidatorTest, with_input_file_is_not_exist) {
     ApplicationConfig app_config;
     fillWithValidInformation(app_config);
@@ -89,6 +103,36 @@ namespace tigrep {
     std::list<std::string> errors;
     validator.getErrors(&errors);
     assertMessageIncluded(errors, "input file not found.");
+  }
+
+  TEST_F(ApplicationConfigValidatorTest, with_invalid_start_time) {
+    ApplicationConfig app_config;
+    fillWithValidInformation(app_config);
+    app_config.start_time = "2014-ab-08 10:00:00";
+    
+    ApplicationConfigValidator validator;
+    
+    bool is_ok = validator.validate(app_config);
+    ASSERT_FALSE(is_ok);
+    
+    std::list<std::string> errors;
+    validator.getErrors(&errors);
+    assertMessageIncluded(errors, "invalid start date time.");
+  }
+
+  TEST_F(ApplicationConfigValidatorTest, with_invalid_end_time) {
+    ApplicationConfig app_config;
+    fillWithValidInformation(app_config);
+    app_config.end_time = "2014-ab-08 10:00:00";
+    
+    ApplicationConfigValidator validator;
+    
+    bool is_ok = validator.validate(app_config);
+    ASSERT_FALSE(is_ok);
+    
+    std::list<std::string> errors;
+    validator.getErrors(&errors);
+    assertMessageIncluded(errors, "invalid end date time.");
   }
 
 } //namespace
