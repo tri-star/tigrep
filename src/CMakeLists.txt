@@ -6,3 +6,5 @@ add_executable(tigrep
   util/date_compare.h
 )
 target_link_libraries(tigrep ${TIGREP_LINK_LIBRARIES})
+
+install(TARGETS tigrep DESTINATION bin)

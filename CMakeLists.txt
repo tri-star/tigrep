@@ -23,3 +23,4 @@ add_subdirectory(src)
 #tests
 enable_testing()
 add_subdirectory(tests)
+
