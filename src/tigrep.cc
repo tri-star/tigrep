@@ -59,17 +59,25 @@ int main(int argc, char* argv[]) {
     std::ofstream ofst;
     if(app_config.isInputFileSpecified()) {
       ifst.open(app_config.input_file.c_str());
+      if(ifst.fail()) {
+        throw std::runtime_error("Failed to open input file.");
+      }
       ist_for_command = &ifst;
     } else {
       ist_for_command = &std::cin;
     }
     if(app_config.isOutputFileSpecified()) {
       ofst.open(app_config.output_file.c_str());
+      if(ofst.fail()) {
+        throw std::runtime_error("Failed to open output file in write mode.");
+      }
       ost_for_command = &ofst;
     } else {
       ost_for_command = &std::cout;
     }
     
+    ist_for_command->exceptions(std::ios::badbit);
+    ost_for_command->exceptions(std::ios::badbit);
     GrepCommand grep_command(*ist_for_command, *ost_for_command, grep_config);
     grep_command.execute();
     
