@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../src/log_position_finder.h"
+#include "../log_position_finder.h"
 
 #include <sstream>
 

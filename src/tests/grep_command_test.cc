@@ -1,4 +1,4 @@
-#include "../src/grep_command.h"
+#include "../grep_command.h"
 
 #include <gtest/gtest.h>
 

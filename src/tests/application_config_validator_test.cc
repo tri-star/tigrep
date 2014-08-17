@@ -1,5 +1,5 @@
 
-#include "../src/application_config_validator.h"
+#include "../application_config_validator.h"
 
 #include <list>
 #include <string>
