@@ -21,11 +21,11 @@ int main(int argc, char* argv[]) {
     app_options.add_options()
       ("help,h",   "show this help message.")
       ("regex,r",  po::value<std::string>(&app_config.regex_string), "specifies regex to capture date part of log.")
-      ("format,F", po::value<std::string>(&app_config.format), "specifies date format in 'strftime' style format.")
-      ("output,o", po::value<std::string>(&app_config.output_file), "output file path(default is to stdout).")
-      ("input",    po::value<std::string>(&app_config.input_file), "input log file path.")
-      ("from,f",   po::value<std::string>(&app_config.start_time), "start date time to extract. The format is same as 'format' option.")
-      ("to,t",     po::value<std::string>(&app_config.end_time),   "end date time to extract. The format is same as 'format' option.")
+      ("format,F", po::value<std::string>(&app_config.format),       "specifies date format in 'strftime' style format.")
+      ("output,o", po::value<std::string>(&app_config.output_file),  "output file path(default is to stdout).")
+      ("input",    po::value<std::string>(&app_config.input_file),   "input log file path.")
+      ("from,f",   po::value<std::string>(&app_config.start_time),   "start date time to extract. The format is same as 'format' option.")
+      ("to,t",     po::value<std::string>(&app_config.end_time),     "end date time to extract. The format is same as 'format' option.")
     ;
   
     po::positional_options_description p;
@@ -53,8 +53,10 @@ int main(int argc, char* argv[]) {
     grep_config.start_date_time = app_config.getStartTime();
     grep_config.end_date_time = app_config.getEndTime();
     
-    std::istream* ist_for_command;
-    std::ostream* ost_for_command;
+    //Setup input/output stream responding to input parameters.
+    //If no input file names given, use stdin/stdout instead.
+    std::istream* ist_for_command = &std::cin;
+    std::ostream* ost_for_command = &std::cout;
     std::ifstream ifst;
     std::ofstream ofst;
     if(app_config.isInputFileSpecified()) {
@@ -63,8 +65,6 @@ int main(int argc, char* argv[]) {
         throw std::runtime_error("Failed to open input file.");
       }
       ist_for_command = &ifst;
-    } else {
-      ist_for_command = &std::cin;
     }
     if(app_config.isOutputFileSpecified()) {
       ofst.open(app_config.output_file.c_str());
@@ -72,13 +72,11 @@ int main(int argc, char* argv[]) {
         throw std::runtime_error("Failed to open output file in write mode.");
       }
       ost_for_command = &ofst;
-    } else {
-      ost_for_command = &std::cout;
     }
     
     ist_for_command->exceptions(std::ios::badbit);
     ost_for_command->exceptions(std::ios::badbit);
-    GrepCommand grep_command(*ist_for_command, *ost_for_command, grep_config);
+    GrepCommand grep_command(ist_for_command, ost_for_command, grep_config);
     grep_command.execute();
     
   } catch(std::exception &e) {

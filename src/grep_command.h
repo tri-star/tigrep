@@ -34,16 +34,16 @@ namespace tigrep {
     static const int OUTPUT_STDOUT = 1; ///Output lines to stdout.
     static const int OUTPUT_FILE   = 2; ///Output lines to a file.
 
-    GrepCommand(std::istream& ist, std::ostream& ost, GrepConfig_t& config) {
+    GrepCommand(std::istream* ist, std::ostream* ost, GrepConfig_t& config) {
       initialize(ist, ost, config);
     }
     
     virtual ~GrepCommand() {
     }
 
-    void initialize(std::istream& ist, std::ostream& ost, GrepConfig_t& config) {
-      ist_ = &ist;
-      ost_ = &ost;
+    void initialize(std::istream* ist, std::ostream* ost, GrepConfig_t& config) {
+      ist_ = ist;
+      ost_ = ost;
       config_ = config;
       status_ = kSTATE_SCAN;
       current_line_ = 0;
