@@ -59,27 +59,35 @@ namespace tigrep {
       std::string date_string_buffer;
       boost::cmatch matches;
 
-      while(status_ != kSTATE_END && !ist_->eof()) {
+      while(status_ != kSTATE_END) {
 
         ist_->getline(read_buffer, buffer_size);
         if(ist_->bad()) {
           throw std::runtime_error("read file error.");
         }
+        if(ist_->eof() && read_buffer[0] == 0) {
+          //If EOF found, and current line is empty, stop log scanning.
+          //(Prevent double empty line sending to ost_ stream)
+          break;
+        }
         current_line_++;
 
-        //現在の行に含まれている時刻を取得する
+        //Get a date part from current line.
         if(!boost::regex_search(read_buffer, matches, config_.pattern)) {
-          //取得できない場合は現在の状態に応じた処理を実行
+          //If current line does not include a date part,
+          //continue processing according to the status_ variable.
           dispatch(read_buffer);
           continue;
         }
-        //取得できた場合は時刻を元に現在の状態を判定
+        //If current line includes a date part,
+        //update status_ variable responding to the date part.
         date_string_buffer = matches.str(1);
         updateStatus(date_string_buffer);
 
-        //現在の状態に応じた処理を実行
+        //Processing action according to the status_ variable.
         dispatch(read_buffer);
       }
+      status_ = kSTATE_END;
 
       delete[] read_buffer;
     }
@@ -125,6 +133,10 @@ namespace tigrep {
 
       switch(status_) {
       case kSTATE_SCAN:
+        if(config_.start_date_time == 0) {
+          status_ = kSTATE_OUTPUT;
+          break;
+        }
         //Update status to kSTATE_OUTPUT if date_string exceeds config_.start_date_time.
         date_compare.setBaseDateTime(config_.start_date_time);
         if(date_compare.compare(date_string.c_str(), config_.format.c_str(), util::DateCompare::kIS_GTE)) {
@@ -132,6 +144,9 @@ namespace tigrep {
         }
         break;
       case kSTATE_OUTPUT:
+        if(config_.end_date_time == 0) {
+          break;
+        }
         //Update status to kSTATE_END if date_string exceeds config_.end_date_time.
         date_compare.setBaseDateTime(config_.end_date_time);
         if(date_compare.compare(date_string.c_str(), config_.format.c_str(), util::DateCompare::kIS_GT)) {
