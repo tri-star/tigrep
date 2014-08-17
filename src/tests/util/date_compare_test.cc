@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../../src/util/date_compare.h"
+#include "../../util/date_compare.h"
 
 #include <sstream>
 

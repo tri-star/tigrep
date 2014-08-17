@@ -10,7 +10,7 @@ find_package(Boost REQUIRED)
 link_directories(/usr/local/lib)
 link_directories(/usr/local/lib64)
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin )
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../bin )
 
 
 #variables for project specific.
