@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
     
     ist_for_command->exceptions(std::ios::badbit);
     ost_for_command->exceptions(std::ios::badbit);
-    GrepCommand grep_command(*ist_for_command, *ost_for_command, grep_config);
+    GrepCommand grep_command(ist_for_command, ost_for_command, grep_config);
     grep_command.execute();
     
   } catch(std::exception &e) {
