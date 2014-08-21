@@ -6,18 +6,20 @@ namespace tigrep {
 
   TEST(LogTypeRepositoryTest, basic) {
     LogTypeRepository repository;
-    LogTypeEntry entry1, entry2;
+    LogTypeEntry *entry1, *entry2;
 
-    entry1.name = "aaa";
-    entry1.regex = "regex1";
-    entry1.format = "format1";
+    entry1 = new LogTypeEntry();
+    entry1->name = "aaa";
+    entry1->regex = "regex1";
+    entry1->format = "format1";
 
-    entry2.name = "bbb";
-    entry2.regex = "regex2";
-    entry2.format = "format2";
+    entry2 = new LogTypeEntry();
+    entry2->name = "bbb";
+    entry2->regex = "regex2";
+    entry2->format = "format2";
 
-    repository.addEntry(entry1);
-    repository.addEntry(entry2);
+    repository.addEntry(*entry1);
+    repository.addEntry(*entry2);
 
     LogTypeEntry* result = repository.getEntry("aaa");
 

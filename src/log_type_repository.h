@@ -4,17 +4,15 @@
 #include <map>
 #include <string>
 
-
 namespace tigrep {
 
   typedef struct LogTypeEntry {
     std::string name;
     std::string regex;
     std::string format;
-	} LogTypeEntry;
+  } LogTypeEntry;
 
-	typedef std::map<std::string, LogTypeEntry*> LogTypeMap;
-
+  typedef std::map<std::string, LogTypeEntry*> LogTypeMap;
 
   /**
    * A class that holds "log type" definitions.
@@ -23,34 +21,43 @@ namespace tigrep {
 
   public:
 
-	  LogTypeRepository() {
-	  }
+    LogTypeRepository() {
+    }
 
-	  virtual ~LogTypeRepository() {
-	  }
+    virtual ~LogTypeRepository() {
+      LogTypeMap::iterator i;
+      LogTypeEntry* entry;
 
-	  void addEntry(LogTypeEntry& entry) {
-	    entries_[entry.name] = &entry;
-	  }
+      for(i = entries_.begin(); i != entries_.end(); i++) {
+        entry = i->second;
+        if(entry != NULL) {
+          delete entry;
+        }
+      }
+    }
 
-	  const LogTypeMap& getList() {
-	    return entries_;
-	  }
+    void addEntry(LogTypeEntry& entry) {
+      entries_[entry.name] = &entry;
+    }
 
-	  LogTypeEntry* getEntry(const std::string& name) {
-	    return getEntry(name.c_str());
-	  }
+    const LogTypeMap& getList() {
+      return entries_;
+    }
+
+    LogTypeEntry* getEntry(const std::string& name) {
+      return getEntry(name.c_str());
+    }
 
     LogTypeEntry* getEntry(const char* name) {
       LogTypeMap::iterator i = entries_.find(name);
-      if(i == entries_.end()) {
+      if (i == entries_.end()) {
         return NULL;
       }
       return i->second;
     }
   private:
 
-	  LogTypeMap entries_;
+    LogTypeMap entries_;
 
   };
 

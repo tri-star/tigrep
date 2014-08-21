@@ -8,6 +8,7 @@ namespace tigrep {
   class ApplicationConfig {
     
   public:
+    std::string log_type;
     std::string regex_string;
     std::string format;
     std::string output_file;
