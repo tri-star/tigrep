@@ -48,7 +48,6 @@ namespace tigrep {
         return;
       }
 
-      //入力値バリデーション
       if(!validateInput(app_config_, &errors)) {
         throw std::logic_error(errors.c_str());
         return;
@@ -56,10 +55,6 @@ namespace tigrep {
 
       //Setup configration from input parameters.
       GrepConfig_t grep_config;
-      grep_config.pattern = boost::regex(app_config_.regex_string);
-      grep_config.format = app_config_.format;
-      grep_config.start_date_time = app_config_.getStartTime();
-      grep_config.end_date_time = app_config_.getEndTime();
 
       //Setup regex and format option according to log type if it specified.
       LogTypeEntry* log_type_entry;
@@ -70,9 +65,14 @@ namespace tigrep {
           return;
         }
 
-        grep_config.pattern = boost::regex(log_type_entry->regex);
-        grep_config.format = log_type_entry->format;
+        app_config_.regex_string = log_type_entry->regex;
+        app_config_.format = log_type_entry->format;
       }
+
+      grep_config.pattern = boost::regex(app_config_.regex_string);
+      grep_config.format = app_config_.format;
+      grep_config.start_date_time = app_config_.getStartTime();
+      grep_config.end_date_time = app_config_.getEndTime();
 
       //Setup input/output stream responding to input parameters.
       //If no input file names given, use stdin/stdout instead.
