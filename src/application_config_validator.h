@@ -23,7 +23,7 @@ namespace tigrep {
     virtual ~ApplicationConfigValidator() {
     }
     
-    bool validate(ApplicationConfig& app_config) {
+    bool validate(const ApplicationConfig& app_config) {
       
       if(app_config.log_type.length() == 0) {
         if(app_config.regex_string.length() == 0) {
