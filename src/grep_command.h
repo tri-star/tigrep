@@ -34,6 +34,9 @@ namespace tigrep {
     static const int OUTPUT_STDOUT = 1; ///Output lines to stdout.
     static const int OUTPUT_FILE   = 2; ///Output lines to a file.
 
+    GrepCommand() {
+    }
+
     GrepCommand(std::istream* ist, std::ostream* ost, GrepConfig_t& config) {
       initialize(ist, ost, config);
     }

@@ -8,6 +8,7 @@ namespace tigrep {
   class ApplicationConfig {
     
   public:
+    std::string log_type;
     std::string regex_string;
     std::string format;
     std::string output_file;
@@ -32,7 +33,7 @@ namespace tigrep {
     time_t getStartTime() {
       struct tm tm;
       char* result = strptime(start_time.c_str(), format.c_str(), &tm);
-      if(result == 0) {
+      if(result == start_time.c_str() || result == 0) {
         return 0;
       }
       return mktime(&tm);
@@ -41,7 +42,7 @@ namespace tigrep {
     time_t getEndTime() {
       struct tm tm;
       char* result = strptime(end_time.c_str(), format.c_str(), &tm);
-      if(result == 0) {
+      if(result == end_time.c_str() || result == 0) {
         return 0;
       }
       return mktime(&tm);
