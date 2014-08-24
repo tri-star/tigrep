@@ -154,5 +154,24 @@ namespace tigrep {
     validator.getErrors(&errors);
     assertMessageIncluded(errors, "invalid end date time.");
   }
+/*
+  TEST_F(ApplicationConfigValidatorTest, with_start_time_omitted) {
+    ApplicationConfig app_config;
+    fillWithValidInformation(app_config);
+    app_config.start_time = "";
+
+    ApplicationConfigValidator validator;
+
+    bool is_ok = validator.validate(app_config);
+    ASSERT_TRUE(is_ok);
+
+    time_t actual_time = app_config.getStartTime();
+    struct tm tm;
+    memset(&tm, 0, sizeof(struct tm));
+    time_t expected_time = mktime(&tm);
+
+    ASSERT_EQ(expected_time, actual_time);
+  }
+*/
 
 } //namespace
