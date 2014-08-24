@@ -55,47 +55,12 @@ namespace tigrep {
 
       //Setup configration from input parameters.
       GrepConfig_t grep_config;
+      setupGrepConfig(&grep_config);
 
-      //Setup regex and format option according to log type if it specified.
-      LogTypeEntry* log_type_entry;
-      if(app_config_.log_type.length() > 0) {
-        log_type_entry = log_type_repository_.getEntry(app_config_.log_type);
-        if(log_type_entry == NULL) {
-          throw std::logic_error("Invalid log type.");
-          return;
-        }
+      std::istream* ist_for_command = NULL;
+      std::ostream* ost_for_command = NULL;
 
-        app_config_.regex_string = log_type_entry->regex;
-        app_config_.format = log_type_entry->format;
-      }
-
-      grep_config.pattern = boost::regex(app_config_.regex_string);
-      grep_config.format = app_config_.format;
-      grep_config.start_date_time = app_config_.getStartTime();
-      grep_config.end_date_time = app_config_.getEndTime();
-
-      //Setup input/output stream responding to input parameters.
-      //If no input file names given, use stdin/stdout instead.
-      std::istream* ist_for_command = &std::cin;
-      std::ostream* ost_for_command = &std::cout;
-      std::ifstream ifst;
-      std::ofstream ofst;
-      if(app_config_.isInputFileSpecified()) {
-        ifst.open(app_config_.input_file.c_str());
-        if(ifst.fail()) {
-          throw std::runtime_error("Failed to open input file.");
-        }
-        ist_for_command = &ifst;
-      }
-      if(app_config_.isOutputFileSpecified()) {
-        ofst.open(app_config_.output_file.c_str());
-        if(ofst.fail()) {
-          throw std::runtime_error("Failed to open output file in write mode.");
-        }
-        ost_for_command = &ofst;
-      }
-      ist_for_command->exceptions(std::ios::badbit);
-      ost_for_command->exceptions(std::ios::badbit);
+      setupIOStream(ist_for_command, ost_for_command);
 
       //Run grep command.
       GrepCommand grep_command(ist_for_command, ost_for_command, grep_config);
@@ -105,8 +70,10 @@ namespace tigrep {
   private:
     
     ApplicationConfig app_config_;
-    GrepCommand grepCommand_;
     LogTypeRepository log_type_repository_;
+    std::ifstream ifst_;
+    std::ofstream ofst_;
+
 
     //Program options.
     po::options_description app_options_;
@@ -193,6 +160,60 @@ namespace tigrep {
         return false;
       }
       return true;
+    }
+
+    void setupGrepConfig(GrepConfig* grep_config) {
+      std::string* regex_string = &app_config_.regex_string;
+      std::string* format = &app_config_.format;
+
+      //Setup regex and format option according to log type if it specified.
+      LogTypeEntry* log_type_entry;
+      if(app_config_.log_type.length() > 0) {
+        log_type_entry = log_type_repository_.getEntry(app_config_.log_type);
+        if(log_type_entry == NULL) {
+          throw std::logic_error("Invalid log type.");
+          return;
+        }
+
+        regex_string = &log_type_entry->regex;
+        format = &log_type_entry->format;
+      }
+
+      grep_config->pattern = boost::regex(*regex_string);
+      grep_config->format = *format;
+      grep_config->start_date_time = app_config_.getStartTime();
+      grep_config->end_date_time = app_config_.getEndTime();
+    }
+
+    /**
+     * Setup input/output stream according to app_config.
+     * If no input/output files are supplied, use stdin/stdout instead.
+     */
+    void setupIOStream(std::istream*& ist, std::ostream*& ost) {
+      ist = &std::cin;
+      ost = &std::cout;
+
+      //Setup input/output stream responding to input parameters.
+      //If no input file names given, use stdin/stdout instead.
+      if(app_config_.isInputFileSpecified()) {
+
+        //ifst_ is class member variable due to its life cycle.
+        //TODO: use shared_ptr to manage life cycle.
+        ifst_.open(app_config_.input_file.c_str());
+        if(ifst_.fail()) {
+          throw std::runtime_error("Failed to open input file.");
+        }
+        ist = &ifst_;
+      }
+      if(app_config_.isOutputFileSpecified()) {
+        ofst_.open(app_config_.output_file.c_str());
+        if(ofst_.fail()) {
+          throw std::runtime_error("Failed to open output file in write mode.");
+        }
+        ost = &ofst_;
+      }
+      ist->exceptions(std::ios::badbit);
+      ost->exceptions(std::ios::badbit);
     }
 
   };
