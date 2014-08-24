@@ -20,6 +20,14 @@ namespace tigrep {
       app_config.end_time   = "2014-08-10 10:00:00";
     }
     
+    void fillWithValidInformationUsingLogType(ApplicationConfig& app_config) {
+      app_config.log_type = "syslog";
+      app_config.output_file = "/tmp/output.log";
+      app_config.input_file = "/usr/bin/bash";
+      app_config.start_time = "2014-08-08 10:00:00";
+      app_config.end_time   = "2014-08-10 10:00:00";
+    }
+
     void assertMessageIncluded(std::list<std::string>& errors, char* message) {
       std::list<std::string>::iterator i;
       
@@ -48,6 +56,18 @@ namespace tigrep {
   }
   
   
+  TEST_F(ApplicationConfigValidatorTest, with_all_parameters_filled_using_log_type) {
+    ApplicationConfig app_config;
+    fillWithValidInformationUsingLogType(app_config);
+
+    ApplicationConfigValidator validator;
+
+    bool is_ok = validator.validate(app_config);
+
+    ASSERT_TRUE(is_ok);
+  }
+
+
   TEST_F(ApplicationConfigValidatorTest, with_regex_missing) {
     ApplicationConfig app_config;
     fillWithValidInformation(app_config);
@@ -134,5 +154,24 @@ namespace tigrep {
     validator.getErrors(&errors);
     assertMessageIncluded(errors, "invalid end date time.");
   }
+/*
+  TEST_F(ApplicationConfigValidatorTest, with_start_time_omitted) {
+    ApplicationConfig app_config;
+    fillWithValidInformation(app_config);
+    app_config.start_time = "";
+
+    ApplicationConfigValidator validator;
+
+    bool is_ok = validator.validate(app_config);
+    ASSERT_TRUE(is_ok);
+
+    time_t actual_time = app_config.getStartTime();
+    struct tm tm;
+    memset(&tm, 0, sizeof(struct tm));
+    time_t expected_time = mktime(&tm);
+
+    ASSERT_EQ(expected_time, actual_time);
+  }
+*/
 
 } //namespace

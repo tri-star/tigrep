@@ -20,7 +20,10 @@ set(TIGREP_LINK_LIBRARIES_FOR_TEST ${TIGREP_LINK_LIBRARIES} pthread libgtest.a l
 
 add_executable(tigrep
   tigrep.cc
+  application.h
   application_config.h
+  application_config_validator.h
+  log_type_repository.h
   grep_command.h
   util/date_compare.h
 )
