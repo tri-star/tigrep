@@ -4,10 +4,12 @@ add_executable(run_tests
   grep_command_test.cc
   log_type_repository_test.cc
   util/date_compare_test.cc
+  util/date_util_test.cc
   ../application_config_validator.h
   ../grep_command.h
   ../log_type_repository.h
   ../util/date_compare.h
+  ../util/date_util.h
   
 )
 target_link_libraries(run_tests ${TIGREP_LINK_LIBRARIES_FOR_TEST})
