@@ -25,7 +25,9 @@ namespace tigrep {
     config.format = "%Y-%m-%d %H:%M:%S";
     config.start_date_time = 1407463200;  //date -d "2014-08-08 11:00:00" +%s
     config.end_date_time = 1407470400;    //date -d "2014-08-08 13:00:00" +%s
-    GrepCommand grep_command(&ist, &ost, config);
+    config.ist = &ist;
+    config.ost = &ost;
+    GrepCommand grep_command(config);
 
     grep_command.execute();
 
@@ -74,7 +76,9 @@ namespace tigrep {
     config.format = "%Y-%m-%d %H:%M:%S";
     config.start_date_time = 0;  //0 means that parameter omitted.
     config.end_date_time = 1407470400;    //date -d "2014-08-08 13:00:00" +%s
-    GrepCommand grep_command(&ist, &ost, config);
+    config.ist = &ist;
+    config.ost = &ost;
+    GrepCommand grep_command(config);
 
     grep_command.execute();
 
@@ -130,7 +134,9 @@ namespace tigrep {
     config.format = "%Y-%m-%d %H:%M:%S";
     config.start_date_time = 1407463200;  //date -d "2014-08-08 11:00:00" +%s
     config.end_date_time = 0;
-    GrepCommand grep_command(&ist, &ost, config);
+    config.ist = &ist;
+    config.ost = &ost;
+    GrepCommand grep_command(config);
 
     grep_command.execute();
 
