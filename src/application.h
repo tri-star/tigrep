@@ -5,6 +5,7 @@
 #include "application_config_validator.h"
 #include "log_type_repository.h"
 #include "grep_command.h"
+#include "util/date_util.h"
 
 #include <boost/regex.hpp>
 #include <boost/program_options.hpp>
@@ -180,8 +181,8 @@ namespace tigrep {
 
       grep_config->pattern = boost::regex(*regex_string);
       grep_config->format = *format;
-      grep_config->start_date_time = app_config_.getStartTime();
-      grep_config->end_date_time = app_config_.getEndTime();
+      grep_config->start_date_time = util::DateUtil::stringToTime(app_config_.start_time, *format);
+      grep_config->end_date_time = util::DateUtil::stringToTime(app_config_.end_time, *format);
     }
 
     /**
