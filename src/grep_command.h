@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <boost/regex.hpp>
 #include <istream>
+#include <ostream>
 #include <string>
 #include <ctime>
 
@@ -17,6 +18,10 @@ namespace tigrep {
 
     time_t start_date_time;
     time_t end_date_time;
+
+    std::istream* ist;
+    std::ostream* ost;
+
   } GrepConfig_t;
 
 
@@ -37,16 +42,16 @@ namespace tigrep {
     GrepCommand() {
     }
 
-    GrepCommand(std::istream* ist, std::ostream* ost, GrepConfig_t& config) {
-      initialize(ist, ost, config);
+    GrepCommand(GrepConfig_t& config) {
+      initialize(config);
     }
     
     virtual ~GrepCommand() {
     }
 
-    void initialize(std::istream* ist, std::ostream* ost, GrepConfig_t& config) {
-      ist_ = ist;
-      ost_ = ost;
+    void initialize(GrepConfig_t& config) {
+      ist_ = config.ist;
+      ost_ = config.ost;
       config_ = config;
       status_ = kSTATE_SCAN;
       current_line_ = 0;
