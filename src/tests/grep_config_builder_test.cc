@@ -37,7 +37,6 @@ namespace tigrep {
       app_config->log_type = "mysql-general";
       app_config->start_time = "140808 10:00:00";
       app_config->end_time = "140808 14:00:00";
-
     }
 
     void setupLogTypeRepository(LogTypeRepository* log_type_repository) {
@@ -204,6 +203,5 @@ namespace tigrep {
     //Asserts
     ASSERT_EQ(0, grep_config.end_date_time);
   }
-
 
 } //namespace

@@ -82,7 +82,6 @@ namespace tigrep {
 
     std::ifstream ifst_;
     std::ofstream ofst_;
-
   };
 
 } //namespace
