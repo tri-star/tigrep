@@ -4,6 +4,7 @@
 #include "application_config.h"
 #include "application_config_validator.h"
 #include "log_type_repository.h"
+#include "grep_config_builder.h"
 #include "grep_command.h"
 #include "util/date_util.h"
 
@@ -56,15 +57,11 @@ namespace tigrep {
 
       //Setup configration from input parameters.
       GrepConfig_t grep_config;
-      setupGrepConfig(&grep_config);
-
-      std::istream* ist_for_command = NULL;
-      std::ostream* ost_for_command = NULL;
-
-      setupIOStream(ist_for_command, ost_for_command);
+      GrepConfigBuilder grep_config_builder;
+      grep_config_builder.build(app_config_, log_type_repository_, &grep_config);
 
       //Run grep command.
-      GrepCommand grep_command(ist_for_command, ost_for_command, grep_config);
+      GrepCommand grep_command(grep_config);
       grep_command.execute();
     }
     
@@ -161,61 +158,6 @@ namespace tigrep {
       }
       return true;
     }
-
-    void setupGrepConfig(GrepConfig* grep_config) {
-      std::string* regex_string = &app_config_.regex_string;
-      std::string* format = &app_config_.format;
-
-      //Setup regex and format option according to log type if it specified.
-      LogTypeEntry* log_type_entry;
-      if(app_config_.log_type.length() > 0) {
-        log_type_entry = log_type_repository_.getEntry(app_config_.log_type);
-        if(log_type_entry == NULL) {
-          throw std::logic_error("Invalid log type.");
-          return;
-        }
-
-        regex_string = &log_type_entry->regex;
-        format = &log_type_entry->format;
-      }
-
-      grep_config->pattern = boost::regex(*regex_string);
-      grep_config->format = *format;
-      grep_config->start_date_time = util::DateUtil::stringToTime(app_config_.start_time, *format);
-      grep_config->end_date_time = util::DateUtil::stringToTime(app_config_.end_time, *format);
-    }
-
-    /**
-     * Setup input/output stream according to app_config.
-     * If no input/output files are supplied, use stdin/stdout instead.
-     */
-    void setupIOStream(std::istream*& ist, std::ostream*& ost) {
-      ist = &std::cin;
-      ost = &std::cout;
-
-      //Setup input/output stream responding to input parameters.
-      //If no input file names given, use stdin/stdout instead.
-      if(app_config_.isInputFileSpecified()) {
-
-        //ifst_ is class member variable due to its life cycle.
-        //TODO: use shared_ptr to manage life cycle.
-        ifst_.open(app_config_.input_file.c_str());
-        if(ifst_.fail()) {
-          throw std::runtime_error("Failed to open input file.");
-        }
-        ist = &ifst_;
-      }
-      if(app_config_.isOutputFileSpecified()) {
-        ofst_.open(app_config_.output_file.c_str());
-        if(ofst_.fail()) {
-          throw std::runtime_error("Failed to open output file in write mode.");
-        }
-        ost = &ofst_;
-      }
-      ist->exceptions(std::ios::badbit);
-      ost->exceptions(std::ios::badbit);
-    }
-
   };
 
 
