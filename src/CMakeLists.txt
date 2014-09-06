@@ -24,8 +24,10 @@ add_executable(tigrep
   application_config.h
   application_config_validator.h
   log_type_repository.h
+  grep_config_builder.h
   grep_command.h
   util/date_compare.h
+  util/date_util.h
 )
 target_link_libraries(tigrep ${TIGREP_LINK_LIBRARIES})
 
