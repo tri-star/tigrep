@@ -164,4 +164,46 @@ namespace tigrep {
     ASSERT_TRUE(ist_for_check.eof());
   }
 
+  //-----------------------------------------------------------------------
+  //check that "apache" log type successfully recognized.
+  TEST(grep_command, apache_log_type_test) {
+
+    std::istringstream ist(
+        "abcdefg\n"
+        "100.101.102.103 - - [01/Jan/2015:00:00:00 +0900] \"GET /index.html HTTP/1.1\"\n"
+        "100.101.102.103 - - [01/Jan/2015:00:10:00 +0900] \"GET /index.html HTTP/1.1\"\n"
+        "100.101.102.103 - - [01/Jan/2015:00:20:00 +0900] \"GET /index.html HTTP/1.1\"\n"
+        "100.101.102.103 - - [01/Jan/2015:00:30:00 +0900] \"GET /index.html HTTP/1.1\"\n"
+    );
+    std::ostringstream ost;
+
+    GrepConfig config;
+
+    //TODO: get pattern, format from LogTypeRepository.
+    config.pattern = "^[^ ]+? [^ ]+? [^ ]+? \\[([^\\]]+?)\\]";
+    config.format = "%d/%b/%Y:%H:%M:%S %z";
+    config.start_date_time = 1420038900;  //date -d "2015-01-01 00:15:00" +%s
+    config.end_date_time = 1420039500;  //date -d "2015-01-01 00:25:00" +%s
+    config.ist = &ist;
+    config.ost = &ost;
+    GrepCommand grep_command(config);
+
+    grep_command.execute();
+
+
+    std::istringstream ist_for_check(ost.str().c_str());
+    char buffer[4096];
+    memset(buffer, 0, 4096);
+
+    //check grep_command.execute() result.
+    ist_for_check.getline(buffer, 4096);
+    ASSERT_STREQ("100.101.102.103 - - [01/Jan/2015:00:20:00 +0900] \"GET /index.html HTTP/1.1\"", buffer);
+
+    //expect no lines left.
+    ist_for_check.getline(buffer, 4096);
+    ASSERT_STREQ("", buffer);
+    ASSERT_TRUE(ist_for_check.eof());
+  }
+
+
 } //namespace
