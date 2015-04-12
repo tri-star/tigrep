@@ -99,7 +99,7 @@ namespace tigrep {
 
 
     void prepareLogTypes(LogTypeRepository* repository) {
-      LogTypeEntry* entry[3];
+      LogTypeEntry* entry[4];
 
       entry[0] = new LogTypeEntry();
       entry[0]->name = "mysql-general";
@@ -117,10 +117,16 @@ namespace tigrep {
       entry[2]->regex = "^(.+? [0-9]+ [0-9:]+) ";
       entry[2]->format = "%b %d %H:%M:%S";
 
+      //
+      entry[3] = new LogTypeEntry();
+      entry[3]->name = "apache";
+      entry[3]->regex = "^[^ ]+? [^ ]+? [^ ]+? \\[([^\\]]+?)\\]";
+      entry[3]->format = "%d/%b/%Y:%H:%M:%S %z";
 
       repository->addEntry(*entry[0]);
       repository->addEntry(*entry[1]);
       repository->addEntry(*entry[2]);
+      repository->addEntry(*entry[3]);
     }
 
 
