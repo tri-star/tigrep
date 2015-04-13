@@ -2,6 +2,7 @@
 #define TIGREP_GREP_COMMAND_H_
 
 #include "util/date_compare.h"
+#include "util/date_util.h"
 
 #include <stdio.h>
 #include <boost/regex.hpp>
@@ -19,6 +20,7 @@ namespace tigrep {
     time_t start_date_time;
     time_t end_date_time;
 
+    std::string input_file;
     std::istream* ist;
     std::ostream* ost;
 
@@ -66,6 +68,11 @@ namespace tigrep {
       char* read_buffer = new char[buffer_size];
       std::string date_string_buffer;
       boost::cmatch matches;
+
+      if(config_.input_file.length() > 0 && config_.start_date_time > 0) {
+        unsigned int distance = getFileSize() / 2;
+        binarySearch(distance);
+      }
 
       while(status_ != kSTATE_END) {
 
@@ -170,6 +177,68 @@ namespace tigrep {
      */
     void output(char* line) {
       *ost_ << line << "\n";
+    }
+
+    /**
+     * Get file size.
+     */
+    unsigned int getFileSize() {
+      ist_->seekg(0, ist_->end);
+      unsigned int length = ist_->tellg();
+      ist_->seekg(0, ist_->beg);
+      return length;
+    }
+
+    /**
+     * Seek position which is near from config_.start_date_time.
+     * @return bool true=Position found. false=Position not found.
+     */
+    bool binarySearch(unsigned int position) {
+      size_t buffer_size = 4096;
+      char* read_buffer = new char[buffer_size];
+      std::string date_string_buffer;
+      boost::cmatch matches;
+      unsigned int next_position;
+
+      //If position is too small, end up searching.
+      //In this case, we need full scan instead.
+      if(position < 100) {
+        ist_->seekg(0, ist_->beg);
+        return false;
+      }
+
+      ist_->seekg(position, ist_->beg);
+
+      time_t current_date_time;
+      while(!ist_->eof()) {
+        ist_->getline(read_buffer, buffer_size);
+        if(ist_->bad()) {
+          throw std::runtime_error("read file error.");
+        }
+
+        //Get a date part from current line.
+        if(!boost::regex_search(read_buffer, matches, config_.pattern)) {
+          continue;
+        }
+
+        // If date time part found, check wether current position is near from start position or not.
+        date_string_buffer = matches.str(1);
+        current_date_time = util::DateUtil::stringToTime(date_string_buffer.c_str(), config_.format.c_str());
+        if(current_date_time < config_.start_date_time && current_date_time + (10 * 60) >= config_.start_date_time) {
+          //If current position is near from start position enough, exit the scanning.
+          return true;
+        }
+
+        //If current position far from start position,
+        //jump current position to half above/below.
+        if(current_date_time >= config_.start_date_time) {
+          return binarySearch(position - position / 2);
+        }
+        if(current_date_time < config_.start_date_time) {
+          return binarySearch(position + position / 2);
+        }
+      }
+
     }
 
   };

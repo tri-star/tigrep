@@ -12,7 +12,7 @@ add_executable(run_tests
   ../log_type_repository.h
   ../util/date_compare.h
   ../util/date_util.h
-  
+  test_lib/util.h
 )
 target_link_libraries(run_tests ${TIGREP_LINK_LIBRARIES_FOR_TEST})
 
