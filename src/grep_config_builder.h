@@ -45,6 +45,10 @@ namespace tigrep {
       grep_config->start_date_time = util::DateUtil::stringToTime(app_config.start_time, *format);
       grep_config->end_date_time = util::DateUtil::stringToTime(app_config.end_time, *format);
 
+      if(app_config.isInputFileSpecified()) {
+        grep_config->input_file = app_config.input_file;
+      }
+
       setupIOStream(app_config, grep_config->ist, grep_config->ost);
     }
 

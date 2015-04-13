@@ -14,7 +14,7 @@ Such like "extract logs between 18:30:00 and 19:00:00".
 
 This is useful for search logs that "date part does not appeared each line" such as MySQL general log.
 
-
+If input data is a file, tigrep is search the start position with "binary search", so scanning is very fast even if log file is big.
 
 ## Usage
 
@@ -24,6 +24,17 @@ General usage is:
 ```
 tigrep --regex="[regex-to-extract-date-part]" --format="[date-format]"
 --from="[start-date]" --to="[end-date]" [input-file]
+
+or
+
+# scan log file with predefined regex and date format.
+tigrep --log-type=[log-type-name] --from="[start-date]" --to="[end-date]" [input-file]
+
+or
+
+# list supported log types.
+tigrep -L
+
 ```
 
 * **regex**: regular expression pattern to . The pattern uses boost::regex as its engine, 
@@ -31,6 +42,8 @@ tigrep --regex="[regex-to-extract-date-part]" --format="[date-format]"
  
 * **format**: date format such as "%Y-%m-%d %H:%M:%S", this string is passed to strftime,
   see [strftime(3)](http://man7.org/linux/man-pages/man3/strftime.3.html) about format information.
+
+* **log-type** log type name, specify one of following `apache`,`mysql-general`,`mysql-slow`,`syslog`. for more information, please refer `tigrep -L`.
 
 * **from**: date time to start extract. Currently, the format is needed to match "format" parameter.
 
@@ -115,8 +128,6 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr
 * Add log-type option to determine regex and format value and make these parameters omittabe.
   (e.g. log-type=mysql-general-log)
 * Support to extend "log-type" by putting file into plugin directory.
-* Use binary search to search start/end position(if show-line-number option does not specified)
-* Add show-line-number option.
 
 
 ## Contribution
