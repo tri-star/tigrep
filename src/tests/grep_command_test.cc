@@ -1,14 +1,28 @@
 #include "../grep_command.h"
+#include "test_lib/util.h"
 
+#include <fstream>
 #include <gtest/gtest.h>
 
 namespace tigrep {
   
 
+  class GrepCommandTest : public ::testing::Test {
+    
+  public:
+
+    void SetUp() {
+      TestUtil::getFixtureDirPath(&fixture_dir_);
+    }
+
+    std::string fixture_dir_;
+
+  };
+
   //-----------------------------------------------------------------------
   //check that GrepCommand recognize valid start/end position.
-  TEST(grep_command, basic) {
-    
+  TEST_F(GrepCommandTest, basic) {
+
     std::istringstream ist(
         "abcdefg\n"
         "[2014-08-08 10:00:00] some-text1\n"
@@ -18,7 +32,7 @@ namespace tigrep {
         "[2014-08-08 14:00:00] some-text5\n"
     );
     std::ostringstream ost;
-    
+
     GrepConfig config;
 
     config.pattern = boost::regex("^\\[([0-9\\-:\\s]+?)\\]");
@@ -58,7 +72,7 @@ namespace tigrep {
 
   //-----------------------------------------------------------------------
   //check that scan start from first line when "from" parameter was omitted.
-  TEST(grep_command, omit_from_parameter) {
+  TEST_F(GrepCommandTest, omit_from_parameter) {
 
     std::istringstream ist(
         "abcdefg\n"
@@ -116,7 +130,7 @@ namespace tigrep {
 
   //-----------------------------------------------------------------------
   //check that scan reaches EOF when "to" parameter was omitted.
-  TEST(grep_command, omit_to_parameter) {
+  TEST_F(GrepCommandTest, omit_to_parameter) {
 
     std::istringstream ist(
         "abcdefg\n"
@@ -166,7 +180,7 @@ namespace tigrep {
 
   //-----------------------------------------------------------------------
   //check that "apache" log type successfully recognized.
-  TEST(grep_command, apache_log_type_test) {
+  TEST_F(GrepCommandTest, apache_log_type_test) {
 
     std::istringstream ist(
         "abcdefg\n"
@@ -206,4 +220,80 @@ namespace tigrep {
   }
 
 
+  TEST_F(GrepCommandTest, binary_search_test) {
+
+    std::string fixture_path(fixture_dir_);
+
+    fixture_path.append("/binary_search_test.log");
+
+    std::ifstream ist;
+    std::ostringstream ost;
+    ist.open(fixture_path.c_str());
+    if(ist.fail()) {
+      throw std::runtime_error("Failed to open input file.");
+    }
+
+    GrepConfig config;
+
+    //TODO: get pattern, format from LogTypeRepository.
+    config.pattern = boost::regex("^\\[([0-9\\-:\\s]+?)\\]");
+    config.format = "%Y-%m-%d %H:%M:%S";
+    config.start_date_time = 1407460800;  //date -d "2014-08-08 10:20:00" +%s
+    config.end_date_time = 1407460860;  //date -d "2014-08-08 10:21:00" +%s
+    config.input_file = fixture_path;
+    config.ist = &ist;
+    config.ost = &ost;
+    GrepCommand grep_command(config);
+
+    grep_command.execute();
+
+
+    std::istringstream ist_for_check(ost.str().c_str());
+    char buffer[4096];
+    memset(buffer, 0, 4096);
+
+    //check grep_command.execute() result.
+    ist_for_check.getline(buffer, 4096);
+    ASSERT_STREQ("[2014-08-08 10:20:00] some-text20", buffer);
+
+  }
+
+
+  TEST_F(GrepCommandTest, small_binary_search_test) {
+
+    std::string fixture_path(fixture_dir_);
+
+    fixture_path.append("/binary_search_small.log");
+
+    std::ifstream ist;
+    std::ostringstream ost;
+    ist.open(fixture_path.c_str());
+    if(ist.fail()) {
+      throw std::runtime_error("Failed to open input file.");
+    }
+
+    GrepConfig config;
+
+    //TODO: get pattern, format from LogTypeRepository.
+    config.pattern = boost::regex("^\\[([0-9\\-:\\s]+?)\\]");
+    config.format = "%Y-%m-%d %H:%M:%S";
+    config.start_date_time = 1407459720;  //date -d "2014-08-08 10:02:00" +%s
+    config.end_date_time = 1407459721; //date -d "2014-08-08 10:02:00" +%s
+    config.input_file = fixture_path;
+    config.ist = &ist;
+    config.ost = &ost;
+    GrepCommand grep_command(config);
+
+    grep_command.execute();
+
+
+    std::istringstream ist_for_check(ost.str().c_str());
+    char buffer[4096];
+    memset(buffer, 0, 4096);
+
+    //check grep_command.execute() result.
+    ist_for_check.getline(buffer, 4096);
+    ASSERT_STREQ("[2014-08-08 10:02:00] some-text2", buffer);
+
+  }
 } //namespace
